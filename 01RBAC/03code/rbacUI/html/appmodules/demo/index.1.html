@@ -1,0 +1,365 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>RBAC Mamagement</title>
+    <!--
+框架jQuery、jQuery easy UI和样式
+-->
+    <script type="text/javascript" src="../../js/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../../js/jquery-easyui-1.7.0/jquery.easyui.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../js/jquery-easyui-1.7.0/themes/default/easyui.css" />
+    <link rel="stylesheet" type="text/css" href="../../js/jquery-easyui-1.7.0/themes/icon.css" />
+
+    <script type="text/javascript">
+        $(function () {
+            //定义本地和远程加载数据模式
+            $("body").data("isLocal", true);
+            function adaptURL(localURL, remotURL) {
+                //debugger;
+                return $("body").data("isLocal") ? localURL : remotURL;
+            }
+
+            //accordion 中无法直接使用 URL 属性，所以直接的使用 ajax 取得数据。
+            $.ajax({
+                type: 'get',
+                dataType: "json",
+                url: adaptURL('menu.json', ''),
+                success: function (data) {
+                    $.each(data, function (i, n) {//加载父类节点即一级菜单
+                        if (i == 0) {//显示第一个一级菜单下的二级菜单
+                            $('#layout_west_accordion').accordion('add', {
+                                title: n.text,
+                                iconCls: n.iconCls,
+                                selected: true,
+                                //为了加入二级菜单方便
+                                content: '<div style="width: 20%;padding:10px"><ul name="' + n.text + '"></ul></div>',
+                            });
+                        } else {
+                            $('#layout_west_accordion').accordion('add', {
+                                //一级菜单的名称
+                                title: n.text,
+                                iconCls: n.iconCls,
+                                selected: false,
+                                content: '<div style="width: 20%;padding:10px"><ul name="' + n.text + '"></ul></div>',
+                            });
+                        }
+
+                    });
+                }
+            });
+            //异步加载子节点，即二级菜单
+            //在一级菜单中的 ul 中添加一个树。树可以有多级
+            $('#layout_west_accordion').accordion({
+                onSelect: function (title, index) {
+                    $("ul[name='" + title + "']").tree({
+                        lines: true,
+                        method: "get",
+                        url: adaptURL('menu2.json', '')
+                    });
+                }
+            });
+            //加载表格主体 
+            $('#dg').datagrid({
+
+                fitColumns: false,
+                striped: true,
+                nowrap: true,
+                idField: "code",
+                pagination: true,//前端分页
+                pagePosition: 'bottom',
+                rownumbers: true,//前端自带序号
+                checkOnSelect: true,//选择行复选框
+                selectOnCheck: true,
+                singleSelect: true,//单行选择
+                sortName: "code",
+                sortOrder: "desc",
+                onClickCell: onClickCell,//
+                onEndEdit: onEndEdit,//
+                //工具栏定义
+                toolbar: [{
+                    iconCls: 'icon-add',
+                    text: '添加',
+                    handler: function(){append()}//!!此出要放入匿名函数
+                }, '-', {
+                    iconCls: 'icon-remove',
+                    text: '删除',
+                    handler: function () { removeit() }
+                }, {
+                    iconCls: 'icon-edit',
+                    text: '编辑',
+                    handler: function () { getChanges() }
+                }, {
+                    iconCls: 'icon-save',
+                    text: '保存',
+                    handler: function () {acceptit()  }
+                }, {
+                    iconCls: 'icon-redo',
+                    text: '撤销',
+                    handler: function () {  reject() }
+                }],
+
+                method: 'get',//默认psot 请求，无法加载报错405
+                url: adaptURL('http://localhost/api/colums','./datagrid_data.json'),
+                //列定义，其中列属性定义很关键
+                columns: [[
+                    { field: 'code', title: 'Code', width: 100, editor: { type: 'text' } },
+                    { field: 'name', title: 'Name', width: 100, editor: { type: 'validatebox', options: { required: true } } },
+                    { field: 'price', title: 'Price', width: 100, editor: { type: 'text' }, align: 'right' }
+                ]]
+            });
+
+            /***********************************************************/
+            //当前编辑索引
+            var editIndex = undefined;
+            //结束编辑校验
+            function endEditing() {
+                if (editIndex == undefined) { return true }
+                if ($('#dg').datagrid('validateRow', editIndex)) {
+                    $('#dg').datagrid('endEdit', editIndex);
+                    editIndex = undefined;
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            /*
+              点击表格触发此函数，选中一行-->始编辑-->获得编辑器。
+            */
+            function onClickCell(index, field) {
+                if (editIndex != index) {
+                    if (endEditing()) {
+                        $('#dg').datagrid('selectRow', index)
+                            .datagrid('beginEdit', index);
+                        var ed = $('#dg').datagrid('getEditor', { index: index, field: field });
+                        if (ed) {
+                            ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                        }
+                        editIndex = index;
+                    } else {
+                        setTimeout(function () {
+                            $('#dg').datagrid('selectRow', editIndex);
+                        }, 0);
+                    }
+                }
+            }
+            //完成编辑但是编辑器销毁之前
+            function onEndEdit(index, row) {
+                // var ed = $(this).datagrid('getEditor', {
+                //         index: index,
+                //         field: 'productid'
+                //     });
+                //     row.productname = $(ed.target).combobox('getText');
+            }
+            /*
+            添加一行,并且进行编辑
+            */
+            function append() {
+                if (endEditing()) {
+                    $('#dg').datagrid('appendRow', { code: 'P' });
+                    editIndex = $('#dg').datagrid('getRows').length - 1;
+                    $('#dg').datagrid('selectRow', editIndex)
+                        .datagrid('beginEdit', editIndex);
+                }
+            }
+            /*
+            取消编辑-->删除行
+            */
+            function removeit() {
+                if (editIndex == undefined) { return }
+                $('#dg').datagrid('cancelEdit', editIndex)
+                    .datagrid('deleteRow', editIndex);
+                editIndex = undefined;
+            }
+            //接受当前编辑
+            function acceptit() {
+                if (endEditing()) {
+                    $('#dg').datagrid('acceptChanges');
+                }
+            }
+            //拒绝当前编辑
+            function reject() {
+                $('#dg').datagrid('rejectChanges');
+                editIndex = undefined;
+            }
+            //受影响的行数
+            function getChanges() {
+                var rowsi = $('#dg').datagrid('getChanges','inserted');
+                console.log(rowsi);
+                var rowsu = $('#dg').datagrid('getChanges','updated');
+                console.log(rowsu);
+                var rowsd = $('#dg').datagrid('getChanges','deleted');
+                console.log(rowsd);
+                var rows = $('#dg').datagrid('getChanges');
+                console.log(rows);
+                alert(rows.length + ' rows are changed!');
+                //可以获得CRUD对应的行数据，前端封装好后包装提交进行保存。
+                var data = {data2insertd:rowsi,data2updated:rowsu,data2deleted:rowsd};
+                console.log(data);//进行提交
+            }
+            /***********************************************************/
+
+
+
+
+        })
+    </script>
+
+    <script>
+        //json返回的数组，经过方法过滤后重新返回给 tree 使用
+        function myLoadFilter(data, parent) {
+            //ul class="easyui-tree" 中的 tree 的value
+
+            var state = $.data(this, 'tree');
+
+
+            function setData() {
+                var serno = 1;
+                var todo = [];
+                for (var i = 0; i < data.length; i++) {
+                    todo.push(data[i]);
+                }
+                while (todo.length) {
+                    var node = todo.shift();
+                    if (node.id == undefined) {
+                        node.id = '_node_' + (serno++);
+                    }
+                    if (node.children) {
+                        node.state = 'closed';
+                        node.children1 = node.children;
+                        node.children = undefined;
+                        todo = todo.concat(node.children1);
+                    }
+                }
+                state.tdata = data;
+            }
+            function find(id) {
+                var data = state.tdata;
+                var cc = [data];
+                while (cc.length) {
+                    var c = cc.shift();
+                    for (var i = 0; i < c.length; i++) {
+                        var node = c[i];
+                        if (node.id == id) {
+                            return node;
+                        } else if (node.children1) {
+                            cc.push(node.children1);
+                        }
+                    }
+                }
+                return null;
+            }
+
+            setData();
+
+            var t = $(this);
+            var opts = t.tree('options');
+            opts.onBeforeExpand = function (node) {
+                var n = find(node.id);
+                if (n.children && n.children.length) { return }
+                if (n.children1) {
+                    var filter = opts.loadFilter;
+                    opts.loadFilter = function (data) { return data; };
+                    t.tree('append', {
+
+                        parent: node.target,
+                        data: n.children1
+                    });
+                    opts.loadFilter = filter;
+                    n.children = n.children1;
+                }
+            };
+            return data;
+        }
+    </script>
+
+</head>
+
+<body>
+    <div class="easyui-layout" fit="true">
+        <div data-options="region:'north'" style="height: 9%;overflow: hidden;">
+
+
+
+
+        </div>
+        <!--<div data-options="region:'south',split:true" style="height: 6%;">
+            <h3>
+                底部位置</h3>
+        </div>
+        -->
+
+        <div data-options="region:'west',split:true" title="导航菜单" style="width: 20%;">
+            <div id="layout_west_accordion" class="easyui-accordion" data-options="multiple:true">
+
+            </div>
+        </div>
+        <div data-options="region:'center'">
+            <!--注意：必须设置 属性 fit="true"-->
+            <div id="tabs" class="easyui-tabs" fit="true">
+                <div id="home" title="欢迎使用" style="padding: 3px; overflow: hidden;">
+                    <!-- 中间内容布局适应屏幕分辨率大小 注意设置属性 fit="true"-->
+                    <div class="easyui-layout" fit="true">
+                        <!--如果左右布局必须设置一个的宽度 width-->
+
+
+
+
+
+                    </div>
+                </div>
+                <div title="菜单1" data-options="closable:true">
+                    <div class="easyui-layout" fit="true">
+                        <div data-options="region:'north'" style="height: 10%;">
+                            <div class="easyui-layout" fit="true">
+                                <div data-options="region:'west',noheader:'true',border:false" style="width: 80%;">
+                                    <form id="ff" method="post">
+                                        <div id="fromk" style="width:33%;height:10%;">
+                                            <label for="name">Name:</label>
+                                            <input class="easyui-validatebox" type="text" name="name"
+                                                data-options="required:true" />
+                                        </div>
+                                        <div id="fromg" style="width:33%;height:10%;">
+                                            <label for="email">Email:</label>
+                                            <input class="easyui-validatebox" type="text" name="email"
+                                                data-options="validType:'email'" />
+                                        </div>
+                                    </form>
+                                </div>
+                                <div data-options="region:'east',noheader:'true',border:false" style="width: 20%;">
+                                    查询
+                                </div>
+                            </div>
+                        </div>
+                        <div data-options="region:'center'" style="height: 10%;">
+                            <a id="btnn" href="#" class="easyui-linkbutton"
+                                data-options="iconCls:'icon-search'">easyui</a>
+                            <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'"
+                                onclick="javascript:alert('easyui')">easyui</a>
+                        </div>
+                        <div data-options="region:'south'" style="height: 80%;width:100%;">
+
+
+                            <table id="dg" style="height: 100%;width:100%;"></table>
+
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <div title="菜单2" data-options="closable:true">
+                    <div class="easyui-panel" style="padding:5px">
+                        <ul class="easyui-tree"
+                            data-options="url:'tree_data.json',method:'get',loadFilter:myLoadFilter"></ul>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
