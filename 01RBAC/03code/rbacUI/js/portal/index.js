@@ -1,16 +1,12 @@
 $(function () {
     //定义本地和远程加载数据模式
-    $("body").data("isLocal", true);
-    function adaptURL(localURL, remotURL) {
-        //debugger;
-        return $("body").data("isLocal") ? localURL : remotURL;
-    }
+   
 
     //accordion 中无法直接使用 URL 属性，所以直接的使用 ajax get方法取得数据。
     $.ajax({
         type: 'get',
         dataType: "json",
-        url: adaptURL('../../js/portal/menu.json', ''),
+        url:  $.jpa.adaptURL({localURL:'../../js/portal/menu.json'}),
         success: function (data) {
             $.each(data, function (i, n) {//加载父类节点即一级菜单
                 if (i == 0) {//显示第一个一级菜单下的二级菜单
@@ -41,7 +37,7 @@ $(function () {
             $("ul[name='" + title + "']").tree({
                 lines: true,
                 method: "get",
-                url: adaptURL('../../js/portal/menu2.json', ''),
+                url:  $.jpa.adaptURL({localURL:'../../js/portal/menu2.json'}),
                 onClick: function (node) {
                     var text = node.text;
                     //var url = node.attributes.url;

@@ -1,10 +1,6 @@
 $(function () {
     //定义本地和远程加载数据模式
-    $("body").data("isLocal", true);
-    function adaptURL(localURL, remotURL) {
-        //debugger;
-        return $("body").data("isLocal") ? localURL : remotURL;
-    }
+
     //加载表格主体 
     $('#dg').datagrid({
 
@@ -46,7 +42,7 @@ $(function () {
         }],
 
         method: 'get',//默认psot 请求，无法加载报错405
-        url: adaptURL('../../js/portal/datagrid_data.json', 'http://localhost/api/colums'),
+        url: $.jpa.adaptURL({localURL:'../../../js/appmodules/demo/datagrid_data.json', remoteURL:'http://localhost/api/colums'}),
         //列定义，其中列属性定义很关键
         columns: [[
             { field: 'code', title: 'Code', width: 100, editor: { type: 'text' } },
