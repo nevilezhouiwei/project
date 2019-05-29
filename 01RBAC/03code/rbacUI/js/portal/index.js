@@ -31,11 +31,11 @@ $(function () {
         }
     });
     //异步加载子节点，即二级菜单
-    //在一级菜单中的 ul 中添加一个树。树可以有多级
+    //在一级菜单中的 ul 中添加一个树。
+    //当从服务端请求数据时候可以优化暂时页面循环展开的问题。
     $('#layout_west_accordion').accordion({
         onSelect: function (title, index) {
             $("ul[name='" + title + "']").tree({
-                lines: true,
                 method: "get",
                 url:  $.jpa.adaptURL({localURL:'../../js/portal/menu2.json'}),
                 onClick: function (node) {
