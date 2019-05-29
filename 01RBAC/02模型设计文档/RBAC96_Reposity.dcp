@@ -1,0 +1,6 @@
+[ConnectionProfile]
+ConnectionType=Native
+Dbms=ORA Oracle
+Description=RBAC96_Reposity_connection
+LogId=springframwork
+TrimSpaces=0
