@@ -3,7 +3,10 @@
  */
 $(function () {   
 
-    
+    /**
+     * 加载左侧菜单树
+     * accordion:本质上是一个 ul 列表
+     */
     $.ajax({
         type: 'get',
         dataType: "json",
@@ -34,11 +37,15 @@ $(function () {
     //异步加载子节点，即二级菜单
     //在一级菜单中的 ul 中添加一个树。
     //!!当从服务端请求数据时候可以优化暂时页面循环展开的问题。
+    //因为这是一个异步树,每次展开后都请求同一个地址,导致子节点展开相同的子菜单。
+    /**
+     * 
+     */
     $('#layout_west_accordion').accordion({
         onSelect: function (title, index) {
             $("ul[name='" + title + "']").tree({
                 method: "get",
-                url:  $.jpa.adaptURL({localURL:'../../js/portal/menu2.json'}),
+                url:  $.jpa.adaptURL({localURL:'../../js/portal/menu2.json'}),//自动拼接当前节点的id传递到服务器。
                 onClick: function (node) {
                     var text = node.text;
                     //var url = node.attributes.url;//可以填写进入动态的url
