@@ -1,0 +1,23 @@
+div>form {
+    margin: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+input[type=text] {
+    
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+  }
+  table
+    {
+        border-top-style:solid;
+        border-right-style:dotted;
+        border-bottom-style:solid;
+        border-left-style:dotted;
+    }
+  

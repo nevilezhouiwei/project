@@ -4,7 +4,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>RBAC Mamagement</title>
+    <title>资源登记</title>
     <!--
 框架jQuery、jQuery easy UI和样式    -->
 
@@ -15,53 +15,154 @@
     <script type="text/javascript" src="../../../assert/plug/jQuery_jpa.js"></script>
     <script type="text/javascript" src="../../../js/appmodules/demo/index.js"></script>
 
+    <link rel="stylesheet" type="text/css" href="./democss.css" />
+    <script>
+
+        //     $('#tinput').validatebox({    
+        //     required: true,    
+        //     validType: 'email',
+        //     label:'tinput'   
+        // });  
+
+        $(function () {
+
+            $('#tinput').textbox({
+                label: '文本输入',
+                labelPosition: 'left',
+                labelWidth: 70,
+                width: 200, required: true,
+                missingMessage: '必填'
+
+            });
+            $('#tinput1').numberbox({
+                label: 'Email',
+                labelPosition: 'left',
+                labelWidth: 70,
+                width: 200,
+                validType: 'email',
+                missingMessage: '必填',
+                invalidMessage: '必须满足邮件格式'
+
+
+            });
+            $('#tinput2').numberbox({
+                label: '数值',
+                labelPosition: 'left',
+                labelWidth: 70,
+                width: 200,
+                missingMessage: '数值'
+
+            });
+            $('#tinput3').textbox({
+                label: '文本输入',
+                labelPosition: 'right',
+                labelWidth: 70,
+                width: 200
+
+            });
+            $('#tinput4').textbox({
+                label: '文本输入',
+                labelPosition: 'right',
+                labelWidth: 70,
+                width: 200//,
+                // icons: [{
+                //     iconCls: 'icon-add',
+                //     handler: function (e) {
+                //         $(e.data.target).textbox('setValue', 'Something added!');
+                //     }
+                // }, {
+                //     iconCls: 'icon-remove',
+                //     handler: function (e) {
+                //         $(e.data.target).textbox('clear');
+                //     }
+                // }]
+            });
+            $('#tinput5').textbox({
+                label: '文本输入',
+                labelPosition: 'right',
+                labelWidth: 70,
+                width: 200
+
+            });
+
+            //一般地没有直接使用验证盒子，验证盒子被其他输入框继承
+            // $('#tinput5').validatebox({
+            //     required: true,
+            //     validType: 'email',
+            //     labelWidth: 70,
+            //     width: 200
+            // });
+
+            $('#btnn-submmit').bind('click', function () {
+                $('#ff').form('submit', {
+                    //url:...,
+                    onSubmit: function () {
+                        // do some check
+                        var isCheck = $('#ff').form('validate');  
+                        // return false to prevent submit;   
+                        return isCheck?true:false; 
+                    },
+                    success: function (data) {
+                        var data = eval('(' + data + ')');  // change the JSON string to javascript object    
+                        if (data.success) {
+                            alert(data.message)
+                        }
+                    }
+                });
+            });
+            $('#btnn-clear').bind('click', function () {
+                $('#ff').form('reset');
+            });
+
+
+        })
+
+
+
+
+    </script>
+
 </head>
 
 <body>
     <div class="easyui-layout" fit="true">
-        <div data-options="region:'center'">
-            <!--注意：必须设置 属性 fit="true"-->
-                    <div class="easyui-layout" fit="true">
-                        <div data-options="region:'north'" style="height: 10%;">
-                            <div class="easyui-layout" fit="true">
-                                <div data-options="region:'west',noheader:'true',border:false" style="width: 80%;">
-                                    <form id="ff" method="post">
-                                        <div id="fromk" style="width:33%;height:10%;">
-                                            <label for="name">Name:</label>
-                                            <input class="easyui-validatebox" type="text" name="name"
-                                                data-options="required:true" />
-                                        </div>
-                                        <div id="fromg" style="width:33%;height:10%;">
-                                            <label for="email">Email:</label>
-                                            <input class="easyui-validatebox" type="text" name="email"
-                                                data-options="validType:'email'" />
-                                        </div>
-                                    </form>
-                                </div>
-                                <div data-options="region:'east',noheader:'true',border:false" style="width: 20%;">
-                                    查询
-                                </div>
-                            </div>
-                        </div>
-                        <div data-options="region:'center'" style="height: 10%;">
-                            <a id="btnn" href="#" class="easyui-linkbutton"
-                                data-options="iconCls:'icon-search'">easyui</a>
-                            <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'"
-                                onclick="javascript:alert('easyui')">easyui</a>
-                        </div>
-                        <div data-options="region:'south'" style="height: 80%;width:100%;">
+        <div data-options="region:'north'" style="height: 25%;">
+            <div class="form-class">
+                <form id="ff" method="post">
+
+                    <table class="form-class">
+                        <tr>
+                            <td> <input id='tinput'></td>
+                            <td><input id='tinput1'></td>
+                        </tr>
+                        <tr>
+                            <td><input id='tinput2'></td>
+                            <td><input id='tinput3'></td>
+                        </tr>
+                        <tr>
+                            <td> <input id='tinput4'></td>
+                            <td> <input id='tinput5'></td>
+                        </tr>
+                        <tr>
+                            <td style='margin: auto'> <a id="btnn-submmit" href="#" class="easyui-linkbutton"
+                                    data-options="iconCls:'icon-search'">查询</a></td>
+                            <td> <a id="btnn-clear" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'"
+                                    onclick="javascript:alert('easyui')">重置</a></td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div>
+        <div data-options="region:'west'" style="height: 80%;width:50%">
+
+        </div>
+        <div data-options="region:'east'" style="height: 80%;width:50%;">
 
 
-                            <table id="dg" style="height: 100%;width:100%;"></table>
-
-                        </div>
-                    </div>
-             
 
 
-                </div>
-            
         </div>
     </div>
 </body>
+
 </html>

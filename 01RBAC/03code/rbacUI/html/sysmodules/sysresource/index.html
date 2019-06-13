@@ -1,30 +1,16 @@
-<!DOCTYPE html
-    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>RBAC Mamagement</title>
-    <!--
-框架jQuery、jQuery easy UI和样式    -->
-
-    <script type="text/javascript" src="../../../assert/jquery/jquery.min.js"></script>
-    <script type="text/javascript" src="../../../assert/jquery-easyui-1.7.0/jquery.easyui.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="../../../assert/jquery-easyui-1.7.0/themes/default/easyui.css" />
-    <link rel="stylesheet" type="text/css" href="../../../assert/jquery-easyui-1.7.0/themes/icon.css" />
-    <script type="text/javascript" src="../../../assert/plug/jQuery_jpa.js"></script>
-    <script type="text/javascript" src="../../../js/appmodules/demo/index.js"></script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RBAC</title>
+    <!-- 资源登记页面 -->
 </head>
-
 <body>
     <div class="easyui-layout" fit="true">
-        <div data-options="region:'center'">
-            <!--注意：必须设置 属性 fit="true"-->
-                    <div class="easyui-layout" fit="true">
                         <div data-options="region:'north'" style="height: 10%;">
                             <div class="easyui-layout" fit="true">
-                                <div data-options="region:'west',noheader:'true',border:false" style="width: 80%;",fit="true">
+                                <div data-options="region:'west',noheader:'true',border:false" style="width: 80%;">
                                     <form id="ff" method="post">
                                         <div style="margin-bottom:20px">
                                             <input class="easyui-textbox" name="name" style="width:100%" data-options="label:'Name:',required:true">
@@ -50,9 +36,9 @@
                         </div>
                         <div data-options="region:'center'" style="height: 10%;">
                             <a id="btnn" href="#" class="easyui-linkbutton"
-                                data-options="iconCls:'icon-search'">查询</a>
+                                data-options="iconCls:'icon-search'">easyui</a>
                             <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'"
-                                onclick="javascript:alert('easyui')">重置</a>
+                                onclick="javascript:alert('easyui')">easyui</a>
                         </div>
                         <div data-options="region:'south'" style="height: 80%;width:100%;">
 
@@ -60,13 +46,5 @@
                             <table id="dg" style="height: 100%;width:100%;"></table>
 
                         </div>
-                    </div>
-             
-
-
-                </div>
-            
-        </div>
-    </div>
 </body>
 </html>
