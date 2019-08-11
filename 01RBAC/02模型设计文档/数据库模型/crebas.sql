@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      ORACLE Version 11g                           */
-/* Created on:     2019/1/23/ÖÜÈý 23:36:07                        */
+/* Created on:     2019-6-17 23:43:30                           */
 /*==============================================================*/
 
 
@@ -44,19 +44,16 @@ drop table t_user_role cascade constraints;
 /*==============================================================*/
 create table t_permission 
 (
-   permission_id        INTEGER              not null,
+   resource_id          INTEGER              not null,
+   t_p_resource_id      INTEGER,
+   resource_name        VARCHAR2(32)         not null,
+   resource_des         VARCHAR2(64)         not null,
+   parent               INTEGER,
    create_time          DATE                 not null,
    create_user          VARCHAR2(64)         not null,
    modify_time          DATE                 not null,
    modify_by            VARCHAR2(64)         not null,
-   t_p_permission_id    INTEGER,
-   permission_name      VARCHAR2(32)         not null,
-   pemission_des        VARCHAR2(64)         not null,
-   url                  VARCHAR2(128)        not null,
-   url_des              VARCHAR2(128)        not null,
-   url_level            INTEGER              not null,
-   parent               INTEGER,
-   constraint PK_T_PERMISSION primary key (permission_id)
+   constraint PK_T_PERMISSION primary key (resource_id)
 );
 
 comment on table t_permission is
@@ -66,7 +63,7 @@ comment on table t_permission is
 /* Index: permission_parent_FK                                  */
 /*==============================================================*/
 create index permission_parent_FK on t_permission (
-   t_p_permission_id ASC
+   t_p_resource_id ASC
 );
 
 /*==============================================================*/
@@ -75,12 +72,12 @@ create index permission_parent_FK on t_permission (
 create table t_role 
 (
    role_id              INTEGER              not null,
+   role_name            VARCHAR2(64)         not null,
+   role_des             VARCHAR2(128)        not null,
    create_time          DATE                 not null,
    create_user          VARCHAR2(64)         not null,
    modify_time          DATE                 not null,
    modify_by            VARCHAR2(64)         not null,
-   role_name            VARCHAR2(64)         not null,
-   role_des             VARCHAR2(128)        not null,
    constraint PK_T_ROLE primary key (role_id)
 );
 
@@ -92,9 +89,9 @@ comment on table t_role is
 /*==============================================================*/
 create table t_role_permission 
 (
-   permission_id        INTEGER              not null,
+   resource_id          INTEGER              not null,
    role_id              INTEGER              not null,
-   constraint PK_T_ROLE_PERMISSION primary key (permission_id, role_id)
+   constraint PK_T_ROLE_PERMISSION primary key (resource_id, role_id)
 );
 
 /*==============================================================*/
@@ -108,7 +105,7 @@ create index t_role_permission2_FK on t_role_permission (
 /* Index: t_role_permission_FK                                  */
 /*==============================================================*/
 create index t_role_permission_FK on t_role_permission (
-   permission_id ASC
+   resource_id ASC
 );
 
 /*==============================================================*/
@@ -117,13 +114,13 @@ create index t_role_permission_FK on t_role_permission (
 create table t_user 
 (
    user_id              VARCHAR2(36)         not null,
+   user_name            VARCHAR2(64)         not null,
+   user_password        VARCHAR2(64)         not null,
+   user_salt            VARCHAR2(32)         not null,
    create_time          DATE                 not null,
    create_user          VARCHAR2(64)         not null,
    modify_time          DATE                 not null,
    modify_by            VARCHAR2(64)         not null,
-   user_name            VARCHAR2(64)         not null,
-   user_password        VARCHAR2(64)         not null,
-   user_salt            VARCHAR2(32)         not null,
    constraint PK_T_USER primary key (user_id)
 );
 
@@ -167,12 +164,12 @@ create index t_user_role_FK on t_user_role (
 );
 
 alter table t_permission
-   add constraint FK_T_PERMIS_PERMISSIO_T_PERMIS foreign key (t_p_permission_id)
-      references t_permission (permission_id);
+   add constraint FK_T_PERMIS_PERMISSIO_T_PERMIS foreign key (t_p_resource_id)
+      references t_permission (resource_id);
 
 alter table t_role_permission
-   add constraint FK_T_ROLE_P_T_ROLE_PE_T_PERMIS foreign key (permission_id)
-      references t_permission (permission_id);
+   add constraint FK_T_ROLE_P_T_ROLE_PE_T_PERMIS foreign key (resource_id)
+      references t_permission (resource_id);
 
 alter table t_role_permission
    add constraint FK_T_ROLE_P_T_ROLE_PE_T_ROLE foreign key (role_id)

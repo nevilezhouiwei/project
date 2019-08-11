@@ -1,16 +1,23 @@
 [{    
     "id": 1,    
-    "text": "菜单1",    
-    "state": "closed" 
+    "text": "用户管理",    
+    "state": "closed" ,
+    "attributes":{    
+        "url":"../appmodules/systemSetting/userManagement/userManagementindex.html"   
+    }    
+
 
      
 },{    
     "id": 2,    
-    "text": "菜单2",    
-    "state": "closed"   
+    "text": "角色管理",    
+    "state": "closed" ,
+    "attributes":{    
+        "url":"../appmodules/systemSetting/roleManagement/roleManagementindex.html"
+    }    
 }
 ,{    
-    "id": 2,    
-    "text": "菜单3",    
+    "id": 3,    
+    "text": "系统参数设置",    
     "state": "closed"   
 }] 

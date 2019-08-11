@@ -39,7 +39,9 @@ $(function () {
     //!!当从服务端请求数据时候可以优化暂时页面循环展开的问题。
     //因为这是一个异步树,每次展开后都请求同一个地址,导致子节点展开相同的子菜单。
     /**
-     * 
+     * 还是保留：
+     * 1、为多级菜单保留
+     * 2、使用返回的数据进行判断，没有子节点的就不请求。
      */
     $('#layout_west_accordion').accordion({
         onSelect: function (title, index) {
@@ -49,12 +51,12 @@ $(function () {
                 onClick: function (node) {
                     var text = node.text;
                     //var url = node.attributes.url;//可以填写进入动态的url
-                    var url = '../appmodules/demo/index.html';//表单demo
+                    var url = node.attributes.url;//表单demo
                     if ($('#tabs').tabs('exists', text)) {
                         $('#tabs').tabs('select', text); 
                     } else {
-                        var content = '<iframe scrolling="auto" frameborder="0"  src="'+url+'" style="width:100%;height:100%;"></iframe>';
-                        $('#tabs').tabs('add', {
+                        var content = '<iframe scrolling="auto" frameborder="0"  src='+url+' style="width:100%;height:100%;"></iframe>';
+                            $('#tabs').tabs('add', {
                             title: text,
                             content: content,
                             closable: true
@@ -70,3 +72,18 @@ $(function () {
 
 
 })
+/**
+ * 权限的管理  
+ * 1、使用反射技术在项目启动时，在context 加载时找到项目的资源信息，比如模块、url。并输出
+ * 
+ * 2、使用注解表示资源的读写导出导入，使用拦截器进行配置。
+ * 
+ * 参考文献：https://www.cnblogs.com/wangzhongqiu/p/6626252.html
+ * 
+ * 如果单独使用内存方法验证，可以使用此方法：https://blog.csdn.net/adsadadaddadasda/article/details/78902779
+ * 
+ * 
+ * 
+ */
+
+ 
