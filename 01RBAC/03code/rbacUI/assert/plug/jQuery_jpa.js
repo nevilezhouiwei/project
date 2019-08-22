@@ -10,7 +10,7 @@ jQuery.jpa = {
     adaptURL: function (options) {
         var  defaults ={
             localURL:'',
-            remoteURL:'',
+            remoteURL:'http://localhost/api',
              isLocal: true
         };
         var opts = $.extend(defaults, options);  
